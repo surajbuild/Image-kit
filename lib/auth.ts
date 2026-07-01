@@ -10,6 +10,7 @@ import GitHubProvider from "next-auth/providers/github";
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
+    maxAge: 30*24*60*60,
   },
 
   secret: process.env.NEXTAUTH_SECRET,
@@ -99,6 +100,7 @@ export const authOptions: NextAuthOptions = {
         if (!dbUser) {
           dbUser = await User.create({
             email: user.email,
+            name: user.name,
             image: user.image,
             provider: account.provider,
           });
@@ -126,5 +128,6 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/login",
+    error: '/login'
   },
 };
