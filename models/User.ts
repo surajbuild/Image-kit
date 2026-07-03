@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 export interface IUser {
     email: string;
     password?: string;
-    provider: "credentials" | "google" | "github";
+    providers: string[];
     image?: string;
     _id?: Schema.Types.ObjectId;
     createdAt?: Date;
@@ -21,10 +21,10 @@ const UserSchema = new Schema<IUser>(
         password: {
             type: String,
         },
-        provider: {
-            type: String,
+        providers: {
+            type: [String],
             enum: ['credentials', 'google', 'github'],
-            default: 'credentials',
+            default: []
         },
         image: {
             type: String,

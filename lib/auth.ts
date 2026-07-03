@@ -10,7 +10,7 @@ import GitHubProvider from "next-auth/providers/github";
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
-    maxAge: 30*24*60*60,
+    maxAge: 30 * 24 * 60 * 60,
   },
 
   secret: process.env.NEXTAUTH_SECRET,
@@ -19,11 +19,13 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
     }),
 
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
     }),
 
     CredentialsProvider({
@@ -51,10 +53,7 @@ export const authOptions: NextAuthOptions = {
             return null;
             // throw new Error("No User found with this");
           }
-          if (user.provider !== "credentials") {
-            return null;
-          }
-          
+
           if (!user.password) {
             return null;
           }
@@ -90,20 +89,22 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
         });
 
-        if (dbUser && dbUser.provider !== account.provider) {
-          return false;
-          //   throw new Error(
-          //     `This email is already registered with ${dbUser.provider}.`,
-          //   );
-        }
-
         if (!dbUser) {
           dbUser = await User.create({
             email: user.email,
             name: user.name,
             image: user.image,
-            provider: account.provider,
+            providers: [account.provider],
           });
+        } else {
+          if (!dbUser.providers) {
+            dbUser.providers = [];
+          }
+    
+          if (!dbUser.providers.includes(account.provider)) {
+            dbUser.providers.push(account.provider);
+            await dbUser.save();
+          }
         }
         user.id = dbUser._id.toString();
       }
@@ -128,6 +129,6 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/login",
-    error: '/login'
+    error: "/login",
   },
 };
