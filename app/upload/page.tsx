@@ -19,6 +19,8 @@ const UploadPage = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof typeof initialFormState | "video" | "thumbnail", string>>>({});
+  const [videoFileId, setVideoFileId] = useState("");
+  const [thumbnailFileId, setThumbnailFileId] = useState("");
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -36,6 +38,35 @@ const UploadPage = () => {
       if (typeof data.thumbnailUrl === "string") return data.thumbnailUrl;
     }
     return "";
+  };
+
+  type UploadResponse = {
+    url: string;
+    fileId: string;
+  };
+
+  const extractUploadData = (
+    response: unknown
+  ): UploadResponse => {
+    if (
+      typeof response === "object" &&
+      response !== null
+    ) {
+      const data = response as Record<string, unknown>;
+
+      return {
+        url: typeof data.url === "string" ? data.url : "",
+        fileId:
+          typeof data.fileId === "string"
+            ? data.fileId
+            : "",
+      };
+    }
+
+    return {
+      url: "",
+      fileId: "",
+    };
   };
 
   const validateForm = () => {
@@ -75,9 +106,15 @@ const UploadPage = () => {
       const videoPayload: VideoFormData = {
         title: form.title.trim(),
         description: form.description.trim(),
+
         videoUrl,
         thumbnailUrl,
+
+        videoFileId,
+        thumbnailFileId,
+
         controls: true,
+        
         transformation: {
           width: 1080,
           height: 1920,
@@ -160,8 +197,9 @@ const UploadPage = () => {
                     fileType="video"
                     onUploadStateChange={setLoading}
                     onSuccess={(res) => {
-                      const url = extractUrl(res);
-                      setVideoUrl(url);
+                      const data = extractUploadData(res);
+                      setVideoUrl(data.url);
+                      setVideoFileId(data.fileId) 
                       setErrors((prev) => ({ ...prev, video: undefined }));
                       setUploadProgress(0);
                     }}
@@ -192,7 +230,10 @@ const UploadPage = () => {
                     onUploadStateChange={setLoading}
                     onSuccess={(res) => {
                       const url = extractUrl(res);
-                      setThumbnailUrl(url);
+                      const data = extractUploadData(res)
+                      setThumbnailUrl(data.url);
+                      setThumbnailFileId(data.fileId);
+
                       setErrors((prev) => ({ ...prev, thumbnail: undefined }));
                       setUploadProgress(0);
                     }}
