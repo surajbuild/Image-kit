@@ -65,11 +65,8 @@ export default async function DashboardPage() {
         ) : (
           <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {videos.map((video) => (
-                <div>
-                    <VideoCard
-                      key={video._id?.toString() ?? video.title}
-                      video={video}
-                    />
+                <div key={video._id?.toString() ?? video.title}>
+                    <VideoCard video={video} />
                     <div className="mt-3 flex justify-end">
                         <DeleteButton id={video._id!.toString()} />
                     </div>
