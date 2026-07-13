@@ -75,9 +75,6 @@ export default async function DashboardPage() {
           </section>
         )}
       </div>
-      <div>
-        <LogoutButton />
-      </div>
     </main>
   );
 }
