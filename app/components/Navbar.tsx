@@ -3,7 +3,15 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link"
 import LogoutButton from "./LogoutButton";
+import { usePathname } from "next/navigation";
+
 const Navbar = () => {
+
+    const pathname = usePathname();
+    
+    if(pathname === "/login" || pathname === "/register") {
+        return null
+    }
     const {data: session} = useSession();
     return (
         <div>
