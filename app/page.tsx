@@ -3,6 +3,8 @@ import { connectToDatabase } from "@/lib/db";
 import VideoModel, { type IVideo } from "@/models/Video";
 import VideoCard from "@/app/components/VideoCard";
 
+export const dynamic = "force-dynamic";
+
 type VideoListItem = Omit<IVideo, "user"> & {
   _id?: string;
   user?: {
